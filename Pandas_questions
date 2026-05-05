@@ -259,6 +259,24 @@ Answer: Used in reshaping data
 df.memory_usage(deep=True)
 df.info()
 
+38.What happens internally when you perform a merge in Pandas?
+
+✅ Answer (what interviewer expects)
+
+👉 Pandas uses:
+
+Hash join (most common)
+Sometimes sort-merge join (if data is sorted)
+
+👉 Steps:
+
+Build hash table on join key
+Match keys from other DataFrame
+Combine rows
+
+👉 Important:
+
+Duplicate keys → row multiplication (many-to-many)
 
 ---------------CODE CHEATSHEET-----------------
 Got it 👍 — I converted your **Pandas Cheatsheet PDF** into a clean **text format (interview + revision friendly)** so you can use it easily.
