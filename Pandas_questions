@@ -1,0 +1,262 @@
+1.What is Pandas?
+Pandas is an open-source Python library used for data manipulation and analysis. It provides high-level data structures like DataFrame and Series for handling structured data efficiently.
+
+2.series v/s Datafame :
+DataFrame = collection of Series sharing same index
+Feature	Series	DataFrame
+Dimension	1D	2D
+Structure	Single column	Multiple columns
+Example	list	table
+
+3. What is an Index in Pandas?
+ Index = labels for rows
+•	Can be numeric or custom 
+•	Immutable (mostly) 
+•	Enables fast lookup
+
+4.  What is the difference between loc and iloc?
+🔹 loc - 
+•	Label-based 
+•	Uses column/row names 
+🔹 iloc -
+•	Position-based 
+•	Uses integer index
+Example:
+df.loc[0, 'name']   # label
+df.iloc[0, 1]       # position
+
+5. What is the difference between copy() and view() 
+
+copy () - Creates a completely new object with its own memory.
+Changes in copied data → ❌ do NOT affect original
+Ex:
+df = pd.DataFrame({'A': [1, 2, 3]})
+df_copy = df.copy()
+
+View () - Returns a reference to the original data (shares memory).
+Changes in view → ✅ affect original DataFrame
+Example:
+df_view = df['A']   # often behaves like a view
+df_view[0] = 100
+print(df)
+
+
+6. What is SettingWithCopyWarning?
+Happens when: You modify a slice of DataFrame incorrectly
+Ex: df[df['age'] > 25]['salary'] = 5000  ❌
+Crct : df.loc[df['age'] > 25, 'salary'] = 5000 ✅
+
+7. What is groupby()?
+Used for aggregation  - Steps:
+1.	Split 
+2.	Apply 
+3.	Combine
+Ex: df.groupby('dept')['salary'].mean()
+
+8. Difference between apply(), map(), applymap()?
+
+map () : Works only on Series (single column)
+Use case: Element-wise transformation
+df['salary'] = df['salary'].map(lambda x: x * 2)
+✔ Applies function to each value
+✔ Can also use dictionary mapping
+
+apply (): Works on Series AND DataFrame
+Case 1: On Series
+df['salary'].apply(lambda x: x * 2)
+
+Case 2: On DataFrame
+Operates on rows or columns
+df.apply(lambda row: row['A'] + row['B'], axis=1)
+
+applymap() : Works on: Entire DataFrame
+Use case: Element-wise operation on all cells
+ex: df.applymap(lambda x: x * 2)
+
+
+
+Function	Applies on	Use
+map()	Series	element-wise
+apply()	Series/DataFrame	row/column
+applymap()	DataFrame	element-wise
+
+9. What is merge() vs join() vs concat()
+🔹 merge()
+•	SQL-like join 
+•	Based on keys 
+🔹 join () : DataFrame.join() joins two DataFrames based on their index (row labels) by default
+•	Index-based merge 
+•	Steps :  Join is done on index  , Matching indices → values combined , Non-matching → NaN
+🔹 concat()
+•	Stack/append data
+
+10. How does Pandas handle missing data?
+    isnull() / notnull()  ,  fillna()  ,  dropna()
+
+11. What is vectorization in Pandas?
+Operations applied on entire column at once. Faster than loops
+Ex: df['salary'] * 2   # vectorized
+
+12. What is the difference between pivot () & pivot_table()?
+pivot() → no aggregation 
+pivot_table() → supports aggregation
+
+13. What is MultiIndex?
+Hierarchical indexing
+Used for:
+•	Complex data representation
+
+14. Why is Pandas faster than Python loops?
+Because:
+•	Built on NumPy (C optimized) 
+•	Vectorized operations 
+•	Efficient memory usage
+
+15. How do you handle large datasets in Pandas?
+
+Use chunking (pd.read_csv(..., chunksize=...)) 
+Select only required columns (usecols) 
+Optimize dtypes (category, int32 instead of int64) 
+Use vectorized operations 
+Avoid apply() on large data 
+Consider switching to Dask or PySpark for scalability
+
+16. How do you optimize memory usage in Pandas?
+Convert object → category 
+Downcast numeric types 
+Drop unnecessary columns 
+Use astype() wisely : general-purpose type conversion method
+df['col'] = df['col'].astype('category')
+
+17. Why is apply() slow? What is the alternative?
+apply() uses Python-level loops → slow 
+Alternatives: 
+•	Vectorized operations 
+•	NumPy functions 
+•	Built-in Pandas methods
+df['A'] + df['B']   # faster than apply
+
+18. How do you handle duplicate data?
+•	Identify:  : df.duplicated()
+•	Remove:  df.drop_duplicates()
+•	Keep specific:  df.drop_duplicates(subset=['col'], keep='last')
+
+19. How do you perform window functions in Pandas?
+Equivalent of SQL window functions
+df['rank'] = df['salary'].rank()
+df['running_total'] = df['salary'].cumsum()
+Group-based: df.groupby('dept')['salary'].rank()
+20. How do you handle skewed data in Pandas?
+Use sampling 
+Normalize/log transform 
+Group aggregation carefully 
+Consider distributed systems if skew is large
+
+21. How do you deal with missing data in production pipelines?
+•  Identify (isnull) 
+•  Decide strategy: 
+•	Drop 
+•	Fill (mean/median/mode) 
+•	Forward fill / backward fill 
+•  Validate after transformation
+
+22. How do you merge very large DataFrames efficiently?
+•	Ensure join keys are indexed 
+•	Reduce columns before merge 
+•	Use appropriate join type 
+•	Sort data before merge (sometimes helps) 
+
+23. What is vectorization and why is it important?
+Applying operations to entire columns at once 
+Uses optimized C backend (NumPy) 
+Much faster than loops
+
+24. How do you debug performance issues in Pandas?
+•	Use .info() and .memory_usage() 
+•	Check for: 
+o	Unnecessary loops 
+o	Large object columns 
+o	Inefficient joins 
+•	Profile code 
+
+25. When should you NOT use Pandas?
+Answer:
+•	Very large data (GB–TB scale) 
+•	Distributed processing needed 
+•	Real-time streaming 
+ Use:
+•	PySpark 
+•	Dask 
+
+26. What is the difference between shallow copy and deep copy?
+Shallow → reference 
+Deep → independent copy
+
+27. You have a 10GB CSV file. What will you do?
+•	Don’t load fully ❌ 
+•	Use chunking
+for chunk in pd.read_csv('file.csv', chunksize=100000):
+    process(chunk)
+
+28. How do you handle schema inconsistencies across multiple CSV files?
+Normalize column names (str.lower(), rename) 
+Align schema using reindex() or column selection 
+Add missing columns with default values 
+Enforce schema using dtype=
+29. How do you ensure data quality in Pandas pipelines?
+Null checks (isnull()) 
+Range validation 
+Duplicate checks 
+Schema validation 
+Assertions/logging
+
+30. How do you handle JSON or nested data in Pandas?
+
+•	Use json_normalize() 
+import pandas as pd
+df = pd.json_normalize(data)
+•	Flatten nested structures for analysis
+
+31. How do you handle timezone-aware data?
+•	Convert using: 
+df['time'] = pd.to_datetime(df['time']).dt.tz_localize('UTC')
+•	Use tz_convert() for transformations 
+
+32. What is explode()
+Used to transform list-like column into multiple rows
+df.explode('col')
+Important for semi-structured data
+
+33. How do you handle incremental data processing?
+
+Filter new records using timestamp or ID 
+Append to existing dataset 
+Avoid full reload
+
+
+34. How do you optimize join performance?
+
+Set index before join : df.set_index('id')
+Reduce dataset size before join
+Use appropriate join type
+Avoid unnecessary columns
+
+35. What is categorical dtype and when to use it?
+
+Used for low-cardinality columns (like country, gender) 
+Saves memory 
+Improves performance
+Categories → ['NY', 'LA'] 
+Data stored as → [0, 1, 0, 1, 0]
+
+36. What is the difference between stack() and unstack()?
+
+Answer: Used in reshaping data
+•	stack() → columns → rows 
+•	unstack() → rows → columns 
+
+37. How do you monitor memory usage?
+df.memory_usage(deep=True)
+df.info()
+
+
