@@ -1,5 +1,5 @@
 1. Count Number of Lines
-Code :
+
 count=0
 with open("data.txt","r") as file:
   for line in file:
@@ -82,7 +82,161 @@ with open("app.log")as file:
           print(line.strip())
 
 
+10.Read Dynamic Data & Store in Dictionary
 
-      
-        
+employee={}
+while True:
+    data=input("Enter Id,name,salary or Done")
+    if data.lower()=="done":
+        break
+    id,name,salary=data.split()
+    employee[id]={
+      "name":name,
+      "salary":float(salary)
+    }
+print(employee)
+
+
+11.Read API Response
+
+import requests
+response=requests.get("https://api.example.com/users")
+data=response.json()
+for user in data:
+    print(user["id"], user["name"], user["email"])
+
+If JSON is nested:
+print(data["employee"]["name"])
+
+
+13. Merge Two CSV Files by Employee ID
+Employee.csv
+101,John
+102,Alice
+
+Salary.csv
+101,50000
+102,60000
+
+import csv
+salary = {}
+
+with open("salary.csv") as file:
+    reader = csv.reader(file)
+    for row in reader:
+        salary[row[0]] = row[1]
+
+with open("employee.csv") as file:
+    reader = csv.reader(file)
+    for row in reader:
+        emp_id = row[0]
+        print(emp_id, row[1], salary.get(emp_id))
+
+
+
+14.Flatten Nested JSON
+{
+ "employee":{
+      "id":101,
+      "name":"John",
+      "address":{
+           "city":"Chicago",
+           "state":"IL"
+      }
+ }
+}
+
+output :
+{
+'id':101,
+'name':'John',
+'city':'Chicago',
+'state':'IL'
+}
+
+Code:
+Solution
+data = {
+ "employee":{
+      "id":101,
+      "name":"John",
+      "address":{
+           "city":"Chicago",
+           "state":"IL"
+      }
+ }
+}
+
+flat = {
+    "id": data["employee"]["id"],
+    "name": data["employee"]["name"],
+    "city": data["employee"]["address"]["city"],
+    "state": data["employee"]["address"]["state"]
+}
+
+print(flat)
+
+15 .Find Invalid Records in a CSV
+import csv
+with open("employees.csv", "r") as file:
+    reader = csv.DictReader(file)
+
+    for row in reader:
+
+        if not row["emp_id"]:
+            print("Invalid Employee ID:", row)
+            continue
+
+        if not row["name"]:
+            print("Invalid Name:", row)
+            continue
+
+        if "@" not in row["email"]:
+            print("Invalid Email:", row)
+            continue
+
+        try:
+            salary = float(row["salary"])
+
+            if salary <= 0:
+                print("Invalid Salary:", row)
+
+        except ValueError:
+            print("Salary is not numeric:", row)
+
+16. 
+ip:logs = [
+    {"timestamp": 1000, "user_id": "user_A", "action": "login", "data_mb": 50},
+    {"timestamp": 1050, "user_id": "user_B", "action": "login", "data_mb": 120},
+    {"timestamp": 1100, "user_id": "user_A", "action": "logout", "data_mb": 75},
+    {"timestamp": 1200, "user_id": "user_B", "action": "logout", "data_mb": 30},
+    {"timestamp": 1300, "user_id": "user_A", "action": "login", "data_mb": 10},
+    {"timestamp": 1340, "user_id": "user_A", "action": "logout", "data_mb": 15}
+]
+op:{
+    "user_A": {"total_duration": 140, "total_data": 150},  # (1100-1000) + (1340-1300) = 140s duration
+    "user_B": {"total_duration": 150, "total_data": 150}   # (1200-1050) = 150s duration
+}
+code:
+result = {}
+login_time = {}
+for log in logs:
+    user = log["user_id"]
+    # Create dictionary for new user
+    if user not in result:
+        result[user] = {
+            "total_duration": 0,
+            "total_data": 0
+        }
+    # Add data usage
+    result[user]["total_data"] += log["data_mb"]
+
+    if log["action"] == "login":
+        login_time[user] = log["timestamp"]
+
+    elif log["action"] == "logout":
+        duration = log["timestamp"] - login_time[user]
+        result[user]["total_duration"] += duration
+
+print(result)
   
